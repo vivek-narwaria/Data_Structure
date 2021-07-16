@@ -1,44 +1,7 @@
-// Copilation g++ -o avl_tree -std=c++11 avl_tree.c
+// Compilation g++ -o avl_tree -std=c++11 avl_tree.cpp -I.
 
-#include <iostream>
-#include <string>
-
-// AVL Tree Node
-typedef struct TreeNode
-{
-    int data;
-    int height;
-    struct TreeNode *left;
-    struct TreeNode *right;
-} TreeNode;
-
-// AVL Tree Class
-class AVL_Tree
-{
-private:
-    TreeNode *root;
-    TreeNode *insertNode(int value, TreeNode *root);
-    TreeNode *getNode(int value);
-    TreeNode *rotateLeft(TreeNode *x);
-    TreeNode *rotateRight(TreeNode *x);
-    int max(int a, int b);
-    int height(TreeNode *root);
-    int getBalanceFactor(TreeNode *root);
-    void prettyPrintTree(TreeNode *node, std ::string prefix, bool isLeft);
-    void deleteCompleteTree(TreeNode *root);
-
-public:
-    void insert(int value);
-    void print();
-    AVL_Tree()
-    {
-        root = NULL;
-    }
-    ~AVL_Tree()
-    {
-        deleteCompleteTree(root);
-    }
-};
+#include <avl_tree.h>
+#include <queue>
 
 // Delete all node in AVL tree
 void AVL_Tree ::deleteCompleteTree(TreeNode *node)
@@ -188,7 +151,7 @@ void AVL_Tree ::prettyPrintTree(TreeNode *node, std ::string prefix, bool isLeft
         prettyPrintTree(node->right, prefix + (isLeft ? "│   " : "    "), false);
     }
 
-    std ::cout << prefix + (isLeft ? "└── " : "┌── ") + std ::to_string(node->data) + ":height(" + std ::to_string(node->height) + ")" + "\n";
+    std ::cout << prefix + (isLeft ? "└── " : "┌── ") + std ::to_string(node->data) + "\n";
 
     if (node->left)
     {
@@ -196,9 +159,84 @@ void AVL_Tree ::prettyPrintTree(TreeNode *node, std ::string prefix, bool isLeft
     }
 }
 
-void AVL_Tree ::print()
+// Pre Order Trversal
+void AVL_Tree ::preOrder(TreeNode *root)
 {
-    prettyPrintTree(root, "", true);
+    if (root == NULL)
+        return;
+
+    std ::cout << std ::to_string(root->data) << " ";
+    preOrder(root->left);
+    preOrder(root->right);
+}
+
+// Post Order Traversal
+void AVL_Tree ::postOrder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    postOrder(root->left);
+    postOrder(root->right);
+    std ::cout << std ::to_string(root->data) << " ";
+}
+
+// In Order Traversal
+void AVL_Tree ::inOrder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+    postOrder(root->left);
+    std ::cout << std ::to_string(root->data) << " ";
+    postOrder(root->right);
+}
+
+// Level Order or BFS Traversal
+void AVL_Tree ::levelOrder(TreeNode *root)
+{
+    if (root == NULL)
+        return;
+
+    std ::queue<TreeNode *> Q;
+    Q.push(root);
+
+    while (!Q.empty())
+    {
+        TreeNode *node = Q.front();
+        Q.pop();
+
+        std ::cout << std ::to_string(node->data) << " ";
+
+        if (node->left)
+            Q.push(node->left);
+
+        if (node->right)
+            Q.push(node->right);
+    }
+
+    return;
+}
+
+void AVL_Tree ::print(traversal option)
+{
+    switch (option)
+    {
+    case PRE_OREDER:
+        preOrder(root);
+        break;
+    case POST_ORDER:
+        postOrder(root);
+        break;
+    case IN_ORDER:
+        inOrder(root);
+        break;
+    case LEVEL_ORDER:
+        levelOrder(root);
+        break;
+    case PRETTY_PRINT:
+        prettyPrintTree(root, "", true);
+        break;
+    }
 }
 
 int main()
@@ -208,7 +246,14 @@ int main()
     for (int index = 1; index < 10; index++)
         tree->insert(index);
 
-    tree->print();
+/*  Options
+    PRE_OREDER,
+    POST_ORDER,
+    IN_ORDER,
+    LEVEL_ORDER,
+    PRETTY_PRINT
+*/
+    tree->print(PRETTY_PRINT);
 
     delete tree;
 }
